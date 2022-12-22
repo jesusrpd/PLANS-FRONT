@@ -5,6 +5,7 @@ import CloseSession from '../components/CloseSession'
 import { Link , useParams} from 'react-router-dom'
 import servicePlan from '../services/plan'
 import serviceUser from '../services/user'
+import serviceData from '../services/data'
 
 export default function Plan(){
 
@@ -14,10 +15,12 @@ export default function Plan(){
     const [newPendiente, setNewPendiente] = useState(false)
     const [labelAssiggned, setLabelAssiggned] = useState([])
     const [pendient, setPendiente] = useState({
-        name: '',
+        plan: '',
+        description: '',
         status: false,
-        assiggned:''
+        assiggned: []
     })
+    const [loader, setLoader] = useState(true)
     const navigate = useNavigate()
     const  {id} = useParams()
 
@@ -31,18 +34,20 @@ export default function Plan(){
     useEffect(()=> {
         const {user} = JSON.parse(window.localStorage.getItem('user'))
         setUser(user)
-        servicePlan.getOne(id).then(p => {
-            
-            setPlan(p.data)
-            setDescription(p.data.description)
+        servicePlan.getOne(id).then(plan => {
+            serviceData.getByPlan(id).then(d => {
+                setPlan(plan.data)
+                setDescription(d.data)
+                setLoader(false)
+            })
         })
     },[id])
 
     const handlePendiente = async () =>{
         setNewPendiente(!newPendiente)
         const users = await serviceUser.getAllUsers()
-        const names = users.map(user => user.username)
-        setLabelAssiggned(names)
+        console.log(users);
+        setLabelAssiggned(users)
     }
 
     const handleChange = e =>{
@@ -52,30 +57,32 @@ export default function Plan(){
 
     const createPendiente = async () => {
         const data = {
-            name: pendient.name,
-            status: pendient.status === 'true'?true:false,
-            assiggned: pendient.assiggned
+            plan: plan._id,
+            description: pendient.description,
+            status: pendient.status?true:false,
+            assiggned: [pendient.assiggned]
         }
+        
         console.log(data);
-        const pendient_new = await servicePlan.addPendiente(plan._id, data)
+        const pendient_new = await serviceData.createData(data)
         console.log(pendient_new);
-        setPendiente({...pendient, name: '', status: '', assiggned: ''})
         setNewPendiente(!newPendiente)
-        setDescription([...description, pendient_new.description])
+        setDescription([...description, pendient_new.data])
     }
 
     const handleDelete = async id => {
-        console.log(id);
-        await servicePlan.removePendiente(plan._id, id)
-        const update_description = description.filter( d => d._id !== id)
-        console.log(update_description);
-        setDescription(update_description)
+        const res = await serviceData.deleteData(id)
+        const updateDatas = description.filter( d => d._id !== id)
+        console.log(updateDatas);
+        setDescription(updateDatas)
     }
 
     return(
-        <div id="plan" className="w-full h-screen pt-44">
-            <CloseSession user={user.username} closeSession={closeSession}/>
-            <div className='absolute top-5 left-20' id='link-back'>
+        <div id="plan" className="w-full h-screen pt-32">
+            {loader?(<span class="loader"></span>):(
+                <>
+                <CloseSession user={user.username} closeSession={closeSession}/>
+                <div className='absolute top-5 left-20' id='link-back'>
                 <Link to="/panel"> Regreasr al panel</Link>
             </div>
             <div className='bg-white p-20 pt-6 w-3/5 rounded-lg m-auto'>
@@ -91,36 +98,38 @@ export default function Plan(){
                         </tr>
                     </thead>
                     <tbody>
-                        {description.map((d,i) =>(
-                            <tr key={d.name} onDoubleClick={() => handleDelete(d._id)}>
-                                <td className='text-center'>{i+1}</td>
-                                <td className='text-center'>{d.name}</td>
-                                <td className='text-center'>{d.status?'Completado':'No completado'}</td>
-                                <td className='text-center'>{d.assiggned === ''?'Sin asignar': d.assiggned}</td>
-                            </tr>
-                        ))}
                         {
-                            newPendiente?(
+                            description.map( (d,i) =>(
+                                <tr key={d._id} onDoubleClick={()=> handleDelete(d._id)}>
+                                    <td>{i+1}</td>
+                                    <td>{d.description}</td>
+                                    <td>{d.status?'Listo':'No Listo'}</td>
+                                    <td>{d.assiggned.map(a=> <p key={a._id}>{a.username}</p>)}</td>
+                                </tr>
+                            ))
+                        }
+                        {
+                        newPendiente?(
                         <tr className='tr-new'>
                             <td>
                                 {description.length+1}
                             </td>
                             <td>
-                                <input onChange={handleChange} type="text"  placeholder='Pendiente...' className='new-pendiente w-11/12' name='name'/>
+                                <input onChange={handleChange} type="text"  placeholder='Pendiente...' className='new-pendiente w-11/12' name='description'/>
                             </td>
                             <td>
                                 <select onChange={handleChange} name="status">
-                                    <option value={false}>No completo</option>
-                                    <option value={true}>Completado</option>
+                                    <option value={false}>No Listo</option>
+                                    <option value={true}>Listo</option>
                                 </select>
                             </td>
                             <td>
                                 <select onChange={handleChange} name="assiggned">
                                     <option value="">Asignar</option>
                                     {labelAssiggned.map(l => (
-                                        <option key={l} value={l}>{l}</option>
+                                        <option key={l._id} value={l._id}>{l.username.charAt(0).toUpperCase() + l.username.slice(1)}</option>
                                     ))}
-                                    <option value="ambos">Ambos</option>
+                                    <option value="Ambos">Ambos</option>
                                 </select>
                             </td>
                         </tr>
@@ -131,15 +140,17 @@ export default function Plan(){
 
                 {
                     !newPendiente ?(
-                        <button onClick={handlePendiente} className='p-2 mt-36 btn-add rounded-lg'>Agregar pendiente +</button>
+                        <button onClick={handlePendiente} className='p-2 mt-9 btn-add rounded-lg'>Agregar pendiente +</button>
                     ):(
                      <div>
-                        <button onClick={createPendiente} className='p-2 mt-36 btn-add mr-5 rounded-lg btn-create'>Crear</button>
-                        <button onClick={handlePendiente} className='p-2 mt-36 btn-add rounded-lg btn-cancel'>Cancelar</button>
+                        <button onClick={createPendiente} className='p-2 mt-9 btn-add mr-5 rounded-lg btn-create'>Crear</button>
+                        <button onClick={handlePendiente} className='p-2 mt-9 btn-add rounded-lg btn-cancel'>Cancelar</button>
                      </div>   
                     )
                 }
             </div>
+                </>
+            )}
         </div>
     )
 }

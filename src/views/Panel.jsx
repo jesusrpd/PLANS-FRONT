@@ -1,26 +1,25 @@
 import { useEffect, useState } from "react"
 import service from '../services/plan'
 import auth from '../routes/auth'
-import {useNavigate, Routes, Route, Outlet} from 'react-router-dom'
+import {useNavigate, Outlet} from 'react-router-dom'
 import CloseSession from "../components/CloseSession"
 
 export default function Panel(){
 
     const [user, setUser] = useState({})
     const [plans, setPlans] = useState([])
+    const [loader, setLoader] = useState(true)
     const navigate = useNavigate()
 
     useEffect(()=> {
         const {user} = JSON.parse(window.localStorage.getItem('user'))
         setUser(user)
         getPlans()
-        // console.log(match);
+        setLoader(false)
     },[])
 
     const getPlans = async () => {
         const plans = await service.getAll()
-        console.log('----------');
-        console.log(plans);
         setPlans(plans.data)
     }
 
@@ -33,7 +32,9 @@ export default function Panel(){
 
     return(
         <div className="w-full h-screen" id="banner-panel">
-            <CloseSession user={user.username} closeSession={closeSession}/>
+            {loader?(<span class="loader"></span>):(
+                    <>
+                    <CloseSession user={user.username} closeSession={closeSession}/>
             <div className="w-full text-center flex flex-col justify-center pt-28">
                 <h2 className="mb-12 text-white">PLANES</h2>
                 <div className="w-full flex items-center justify-around">
@@ -49,6 +50,9 @@ export default function Panel(){
                     <Outlet/>
                 </div>
             </div>
+                    </>
+                )
+            }
         </div>
     )
 }
