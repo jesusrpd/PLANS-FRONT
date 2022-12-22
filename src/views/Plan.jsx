@@ -8,6 +8,7 @@ import serviceUser from '../services/user'
 import serviceData from '../services/data'
 import WolfPNG from '../img/lobo.png'
 import RacconPNG from '../img/raccoon.png'
+import PencilSVG  from '../img/pencil.svg'
 
 export default function Plan(){
 
@@ -23,6 +24,7 @@ export default function Plan(){
         assiggned: []
     })
     const [loader, setLoader] = useState(true)
+    const [edit, setEdit] = useState(false)
     const navigate = useNavigate()
     const  {id} = useParams()
 
@@ -94,24 +96,29 @@ export default function Plan(){
         setLoader(false)
     }
 
+    const handleEdit = id => {
+        console.log(id);
+    }
+
     return(
         <div id="plan" className="w-full pt-32 min-h-screen pb-32">
             {loader?(<span className="loader"></span>):(
                 <>
                 <CloseSession user={user.username} closeSession={closeSession}/>
-                <div className='absolute top-5 left-20' id='link-back'>
+                <div className='absolute top-20 right-2' id='link-back'>
                 <Link to="/panel"> Regreasr al panel</Link>
             </div>
-            <div className='bg-white p-20 pt-6 w-4/5 rounded-lg m-auto'>
+            <div className='bg-white p-0 pt-6 w-11/12 rounded-lg m-auto pb-4'>
                 <h3 className='text-center'>{plan.name}</h3>
 
-                <table className='w-11/12 m-auto mt-7'>
+                <table className='w-11/12 m-auto mt-7 mb-7'>
                     <thead>
                         <tr>
                             <th className='text-white text-center'>Núm</th>
                             <th className='text-white text-center'>Dato</th>
                             <th className='text-white text-center'>Status</th>
                             <th className='text-white text-center'>Asignado</th>
+                            {/* <th className='text-white text-center'>Editar</th> */}
                         </tr>
                     </thead>
                     <tbody>
@@ -122,6 +129,9 @@ export default function Plan(){
                                     <td>{d.description}</td>
                                     <td>{d.status?'Listo':'No Listo'}</td>
                                     <td className='flex justify-center items-center'>{d.assiggned.map(a=> <p key={a._id} className="flex mx-1">{a.username === 'jesus'?<img src={WolfPNG} alt="wolf icon" width={25}/>: <img src={RacconPNG} alt="raccoon icon" width={25}/>}</p>)}</td>
+                                    {/* <td onClick={() => handleEdit(d._id)}>
+                                        <img src={PencilSVG} alt="pencil icon" className='m-auto bg-white'/>
+                                    </td> */}
                                 </tr>
                             ))
                         }
@@ -155,6 +165,7 @@ export default function Plan(){
                     </tbody>
                 </table>
 
+                <div className='mb-5 ml-5'>
                 {
                     !newPendiente ?(
                         <button onClick={handlePendiente} className='p-2 mt-9 btn-add rounded-lg'>Agregar pendiente +</button>
@@ -165,6 +176,7 @@ export default function Plan(){
                      </div>   
                     )
                 }
+                </div>
             </div>
                 </>
             )}
