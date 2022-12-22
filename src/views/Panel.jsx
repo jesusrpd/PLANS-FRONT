@@ -19,6 +19,8 @@ export default function Panel(){
 
     const getPlans = async () => {
         const plans = await service.getAll()
+        console.log('----------');
+        console.log(plans);
         setPlans(plans.data)
     }
 
