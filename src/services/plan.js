@@ -2,7 +2,9 @@ import axios from 'axios'
 const baseUrl = process.env.REACT_APP_URI_API
 
 const getAll = async () => {
+    console.log(baseUrl);
     const res = await axios.get(`${baseUrl}/plans`)
+    console.log(res);
         return res.data
 }
 
