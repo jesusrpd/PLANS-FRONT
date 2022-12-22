@@ -32,7 +32,7 @@ export default function Panel(){
 
     return(
         <div className="w-full h-screen" id="banner-panel">
-            {loader?(<span class="loader"></span>):(
+            {loader?(<span className="loader"></span>):(
                     <>
                     <CloseSession user={user.username} closeSession={closeSession}/>
             <div className="w-full text-center flex flex-col justify-center pt-28">

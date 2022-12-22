@@ -131,6 +131,21 @@ td{
 tr:nth-child(even) {
   background-color: #46024b;
   color: white;
+
+}
+
+tr:nth-child(even) input{
+  background-color: #46024b;
+  color: white;
+  border-bottom: 2px solid white;
+}
+
+tr:nth-child(even) input::placeholder{
+  color: white;
+}
+
+tr:nth-child(even) select{
+  color: #46024b;
 }
 
 #link-back{

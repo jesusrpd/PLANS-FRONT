@@ -6,6 +6,8 @@ import { Link , useParams} from 'react-router-dom'
 import servicePlan from '../services/plan'
 import serviceUser from '../services/user'
 import serviceData from '../services/data'
+import WolfPNG from '../img/lobo.png'
+import RacconPNG from '../img/raccoon.png'
 
 export default function Plan(){
 
@@ -56,39 +58,54 @@ export default function Plan(){
     }
 
     const createPendiente = async () => {
+
+        if(pendient.assiggned === 'Ambos'){
+            pendient.assiggned = [labelAssiggned[0]._id, labelAssiggned[1]._id]
+        }else{
+            pendient.assiggned = [pendient.assiggned]
+        }
+        console.log(pendient.assiggned);
+        setLoader(true)
         const data = {
             plan: plan._id,
             description: pendient.description,
             status: pendient.status?true:false,
-            assiggned: [pendient.assiggned]
+            assiggned: pendient.assiggned
         }
-        
-        console.log(data);
         const pendient_new = await serviceData.createData(data)
         console.log(pendient_new);
         setNewPendiente(!newPendiente)
-        setDescription([...description, pendient_new.data])
+        servicePlan.getOne(id).then(plan => {
+            serviceData.getByPlan(id).then(d => {
+                setPlan(plan.data)
+                setDescription(d.data)
+                setLoader(false)
+            })
+        })
+        setLoader(false)
     }
 
     const handleDelete = async id => {
+        setLoader(true)
         const res = await serviceData.deleteData(id)
         const updateDatas = description.filter( d => d._id !== id)
         console.log(updateDatas);
         setDescription(updateDatas)
+        setLoader(false)
     }
 
     return(
-        <div id="plan" className="w-full h-screen pt-32">
-            {loader?(<span class="loader"></span>):(
+        <div id="plan" className="w-full pt-32 min-h-screen pb-32">
+            {loader?(<span className="loader"></span>):(
                 <>
                 <CloseSession user={user.username} closeSession={closeSession}/>
                 <div className='absolute top-5 left-20' id='link-back'>
                 <Link to="/panel"> Regreasr al panel</Link>
             </div>
-            <div className='bg-white p-20 pt-6 w-3/5 rounded-lg m-auto'>
+            <div className='bg-white p-20 pt-6 w-4/5 rounded-lg m-auto'>
                 <h3 className='text-center'>{plan.name}</h3>
 
-                <table className='w-5/6 m-auto mt-7'>
+                <table className='w-11/12 m-auto mt-7'>
                     <thead>
                         <tr>
                             <th className='text-white text-center'>Núm</th>
@@ -104,7 +121,7 @@ export default function Plan(){
                                     <td>{i+1}</td>
                                     <td>{d.description}</td>
                                     <td>{d.status?'Listo':'No Listo'}</td>
-                                    <td>{d.assiggned.map(a=> <p key={a._id}>{a.username}</p>)}</td>
+                                    <td className='flex justify-center items-center'>{d.assiggned.map(a=> <p key={a._id} className="flex mx-1">{a.username === 'jesus'?<img src={WolfPNG} alt="wolf icon" width={25}/>: <img src={RacconPNG} alt="raccoon icon" width={25}/>}</p>)}</td>
                                 </tr>
                             ))
                         }
@@ -115,7 +132,7 @@ export default function Plan(){
                                 {description.length+1}
                             </td>
                             <td>
-                                <input onChange={handleChange} type="text"  placeholder='Pendiente...' className='new-pendiente w-11/12' name='description'/>
+                                <input autoComplete='off' onChange={handleChange} type="text"  placeholder='Pendiente...' className='new-pendiente w-11/12' name='description'/>
                             </td>
                             <td>
                                 <select onChange={handleChange} name="status">
