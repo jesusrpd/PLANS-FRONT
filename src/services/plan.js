@@ -13,4 +13,14 @@ const getOne = async id => {
     return res.data
 }
 
-export default {getAll, getOne}
+const addPendiente = async (id, data) => {
+    const res = await axios.put(`${baseUrl}/plans/${id}`, data)
+    return res.data
+}
+
+const removePendiente = async (id, pent) => {
+    const res = await axios.delete(`${baseUrl}/plans/${id}/${pent}`, )
+    return res.data
+}
+
+export default {getAll, getOne, addPendiente, removePendiente}
