@@ -54,3 +54,63 @@ small{
   color: #00bf72;
 
 }
+
+h2{
+  font-size: 30px;
+  font-weight: bold;
+}
+
+h3{
+  font-weight: bolder;
+  font-size: 30px;
+  color: #1d0868;
+}
+
+.plan{
+  cursor: pointer;
+  transition: all .3s ease-in-out;
+  color: #1d0868;
+  border: 2px solid white;
+}
+
+.plan:hover{
+  background: transparent;
+  color: white;
+}
+
+.plan-tittle{
+  font-size: 25px;
+  font-weight: bolder;
+  
+}
+
+.plan-user{
+  margin: 5px 0;
+}
+
+.plan-description{
+  text-decoration: underline;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-sesion{
+  transition: all .3s ease-in-out;
+  background: rgb(255, 45, 45);
+  color: white;
+  font-weight: bold;
+  border: 2px solid rgb(255, 45, 45);
+}
+
+.btn-sesion:hover{
+  background: transparent;
+  color: rgb(255, 45, 45);
+}
+
+#banner-panel{
+  background-image: linear-gradient(to right top, #652994, #a60983, #d20065, #e93542, #eb6612);
+}
+
+#plan{
+  background-image: linear-gradient(to right top, #000000, #230616, #37052c, #46024b, #470e72);
+}

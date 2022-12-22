@@ -20,7 +20,7 @@ export default function Login(){
                 setError(!error)
                 return
             }
-            console.log('se por');
+            
             auth.login(() => {
                 window.localStorage.setItem('user', JSON.stringify(res.data))
                 window.location = "/panel"
